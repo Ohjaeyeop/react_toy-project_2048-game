@@ -1,6 +1,7 @@
 import React from "react";
+import MainTemplate from "./components/MainTemplate";
 function App() {
-  return <div className="App"></div>;
+  return <MainTemplate />;
 }
 
 export default App;
