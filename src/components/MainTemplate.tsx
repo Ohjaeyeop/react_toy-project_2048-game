@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import useInitialize from "../hooks/useInitialize";
 import MainBoard from "./MainBoard";
 
 const MainTemplateBlock = styled.div`
@@ -38,12 +39,27 @@ const ButtonWrapper = styled.div`
 `;
 
 function MainTemplate() {
+  const initiallize = useInitialize();
+
+  function getRandomNumber() {
+    return Math.floor(Math.random() * 4);
+  }
+  const onClick = () => {
+    let point: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      point[i] = getRandomNumber();
+      if (i === 3 && point[0] === point[2] && point[1] === point[3]) {
+        point[3] = (point[1] + 1) % 4;
+      }
+    }
+    initiallize(point);
+  };
   return (
     <MainTemplateBlock>
       <HeaderWrapper>
         <h1>2048</h1>
         <ButtonWrapper>
-          <button>New Game</button>
+          <button onClick={onClick}>New Game</button>
         </ButtonWrapper>
       </HeaderWrapper>
       <MainBoard />
