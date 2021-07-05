@@ -40,7 +40,7 @@ const Box = styled.div<BoxProps>`
   align-items: center;
   font-weight: bold;
 
-  transition: background 0.2s ease-in;
+  transition: background 0.4s ease-in;
 `;
 
 function MainBoard() {
