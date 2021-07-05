@@ -1,4 +1,5 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
+import getNextBoxState from "../lib/getNextBoxState";
 
 const INITIALIZE = "box/INITIALIZE";
 const LEFTARROWCLICK = "box/LEFTARROWCLICK";
@@ -45,6 +46,34 @@ const box = createReducer<BoxState, BoxAction>(initialState, {
           return 2;
         }
         return 1;
+      });
+    }),
+  }),
+  [LEFTARROWCLICK]: (state) => ({
+    boxstate: getNextBoxState(1, state.boxstate).map((innerArray) => {
+      return innerArray.map((number) => {
+        return number;
+      });
+    }),
+  }),
+  [RIGHTARROWCLICK]: (state) => ({
+    boxstate: getNextBoxState(2, state.boxstate).map((innerArray) => {
+      return innerArray.map((number) => {
+        return number;
+      });
+    }),
+  }),
+  [UPARROWCLICK]: (state) => ({
+    boxstate: getNextBoxState(3, state.boxstate).map((innerArray) => {
+      return innerArray.map((number) => {
+        return number;
+      });
+    }),
+  }),
+  [DOWNARROWCLICK]: (state) => ({
+    boxstate: getNextBoxState(4, state.boxstate).map((innerArray) => {
+      return innerArray.map((number) => {
+        return number;
       });
     }),
   }),

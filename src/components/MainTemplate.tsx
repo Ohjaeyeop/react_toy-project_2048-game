@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import useInitialize from "../hooks/useInitialize";
 import MainBoard from "./MainBoard";
+import getRandomPoints from "../lib/getRandomPoints";
+import useArrowClick from "../hooks/useArrowClick";
 
 const MainTemplateBlock = styled.div`
   width: 512px;
@@ -39,21 +41,33 @@ const ButtonWrapper = styled.div`
 `;
 
 function MainTemplate() {
+  const { onLeftArrow, onRightArrow, onUpArrow, onDownArrow } = useArrowClick();
   const initiallize = useInitialize();
 
-  function getRandomNumber() {
-    return Math.floor(Math.random() * 4);
-  }
   const onClick = () => {
-    let point: number[] = [];
-    for (let i = 0; i < 4; i++) {
-      point[i] = getRandomNumber();
-      if (i === 3 && point[0] === point[2] && point[1] === point[3]) {
-        point[3] = (point[1] + 1) % 4;
-      }
-    }
+    let point: number[] = getRandomPoints();
     initiallize(point);
   };
+
+  const handleKeyDown = (event: any): void => {
+    if (event.key === "ArrowLeft") {
+      onLeftArrow();
+    } else if (event.key === "ArrowRight") {
+      onRightArrow();
+    } else if (event.key === "ArrowUp") {
+      onUpArrow();
+    } else if (event.key === "ArrowDown") {
+      onDownArrow();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <MainTemplateBlock>
       <HeaderWrapper>

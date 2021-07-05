@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import useBox from "../hooks/useBox";
 import palette from "../styles/palette";
 
