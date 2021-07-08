@@ -1,22 +1,19 @@
 import { useCallback } from "react";
 import { useDispatch } from "react-redux";
-import {
-  downarrowclick,
-  leftarrowclick,
-  rightarrowclick,
-  uparrowclick,
-} from "../modules/box";
+import { createnewbox, updateboxstate } from "../modules/box";
 
 export default function useArrowClick() {
   const dispatch = useDispatch();
 
-  const onLeftArrow = useCallback(() => dispatch(leftarrowclick()), [dispatch]);
-  const onRightArrow = useCallback(
-    () => dispatch(rightarrowclick()),
+  const onUpdateBoxState = useCallback(
+    (nextBoxState) => dispatch(updateboxstate(nextBoxState)),
     [dispatch]
   );
-  const onUpArrow = useCallback(() => dispatch(uparrowclick()), [dispatch]);
-  const onDownArrow = useCallback(() => dispatch(downarrowclick()), [dispatch]);
 
-  return { onLeftArrow, onRightArrow, onUpArrow, onDownArrow };
+  const onCreateNewBox = useCallback(
+    (point) => dispatch(createnewbox(point)),
+    [dispatch]
+  );
+
+  return { onUpdateBoxState, onCreateNewBox };
 }

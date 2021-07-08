@@ -1,9 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import useInitialize from "../hooks/useInitialize";
 import MainBoard from "./MainBoard";
 import getRandomPoints from "../lib/getRandomPoints";
 import useArrowClick from "../hooks/useArrowClick";
+import useBox from "../hooks/useBox";
+import getNextBoxState from "../lib/getNextBoxState";
+import getRandomPoint from "../lib/getRandomPoint";
 
 const MainTemplateBlock = styled.div`
   width: 512px;
@@ -41,32 +44,90 @@ const ButtonWrapper = styled.div`
 `;
 
 function MainTemplate() {
-  const { onLeftArrow, onRightArrow, onUpArrow, onDownArrow } = useArrowClick();
+  const { onUpdateBoxState, onCreateNewBox } = useArrowClick();
   const initiallize = useInitialize();
+  const [point, setPoint] = useState<number[]>(getRandomPoints());
+  const boxes = useBox();
 
   const onClick = () => {
-    let point: number[] = getRandomPoints();
+    setPoint(getRandomPoints());
     initiallize(point);
   };
 
-  const handleKeyDown = (event: any): void => {
-    if (event.key === "ArrowLeft") {
-      onLeftArrow();
-    } else if (event.key === "ArrowRight") {
-      onRightArrow();
-    } else if (event.key === "ArrowUp") {
-      onUpArrow();
-    } else if (event.key === "ArrowDown") {
-      onDownArrow();
-    }
-  };
+  const handleKeyDown = useCallback(
+    (event: any): void => {
+      let checkCreateNewBox = false;
+      if (event.key === "ArrowLeft") {
+        const p = new Promise((resolve, reject) => {
+          let timerId = setInterval(() => {
+            const { checkMovePossible, boxState } = getNextBoxState(1, boxes);
+            if (!checkMovePossible) {
+              resolve(checkCreateNewBox);
+              setTimeout(() => clearInterval(timerId));
+            }
+            checkCreateNewBox = true;
+            onUpdateBoxState(boxState);
+          }, 50);
+        });
+        p.then((checkCreateNewBox) => {
+          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
+        });
+      } else if (event.key === "ArrowRight") {
+        const p = new Promise((resolve, reject) => {
+          let timerId = setInterval(() => {
+            const { checkMovePossible, boxState } = getNextBoxState(2, boxes);
+            if (!checkMovePossible) {
+              resolve(checkCreateNewBox);
+              setTimeout(() => clearInterval(timerId));
+            }
+            checkCreateNewBox = true;
+            onUpdateBoxState(boxState);
+          }, 50);
+        });
+        p.then((checkCreateNewBox) => {
+          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
+        });
+      } else if (event.key === "ArrowUp") {
+        const p = new Promise((resolve, reject) => {
+          let timerId = setInterval(() => {
+            const { checkMovePossible, boxState } = getNextBoxState(3, boxes);
+            if (!checkMovePossible) {
+              resolve(checkCreateNewBox);
+              setTimeout(() => clearInterval(timerId));
+            }
+            checkCreateNewBox = true;
+            onUpdateBoxState(boxState);
+          }, 50);
+        });
+        p.then((checkCreateNewBox) => {
+          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
+        });
+      } else if (event.key === "ArrowDown") {
+        const p = new Promise((resolve, reject) => {
+          let timerId = setInterval(() => {
+            const { checkMovePossible, boxState } = getNextBoxState(4, boxes);
+            if (!checkMovePossible) {
+              resolve(checkCreateNewBox);
+              setTimeout(() => clearInterval(timerId));
+            }
+            checkCreateNewBox = true;
+            onUpdateBoxState(boxState);
+          }, 50);
+        });
+        p.then((checkCreateNewBox) => {
+          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
+        });
+      }
+    },
+    [boxes, onUpdateBoxState, onCreateNewBox]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   return (
     <MainTemplateBlock>
@@ -76,7 +137,7 @@ function MainTemplate() {
           <button onClick={onClick}>New Game</button>
         </ButtonWrapper>
       </HeaderWrapper>
-      <MainBoard />
+      <MainBoard boxes={boxes} />
     </MainTemplateBlock>
   );
 }

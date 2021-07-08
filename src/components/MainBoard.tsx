@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import useBox from "../hooks/useBox";
 import palette from "../styles/palette";
 
 const MainBoardBlock = styled.div`
@@ -39,12 +38,10 @@ const Box = styled.div<BoxProps>`
   justify-content: center;
   align-items: center;
   font-weight: bold;
-
-  transition: background 0.4s ease-in;
 `;
 
-function MainBoard() {
-  const boxes = useBox();
+function MainBoard(props: any) {
+  const boxes: number[][] = props.boxes;
   return (
     <MainBoardBlock>
       {boxes.map((boxline) =>

@@ -1,24 +1,17 @@
 import { createAction, ActionType, createReducer } from "typesafe-actions";
-import getNextBoxState from "../lib/getNextBoxState";
 
 const INITIALIZE = "box/INITIALIZE";
-const LEFTARROWCLICK = "box/LEFTARROWCLICK";
-const RIGHTARROWCLICK = "box/RIGHTARROWCLICK";
-const UPARROWCLICK = "box/UPARROWCLICK";
-const DOWNARROWCLICK = "box/DOWNARROWCLICK";
+const UPDATEBOXSTATE = "box/UPDATEBOXSTATE";
+const CREATENEWBOX = "box/CREATENEWBOX";
 
 export const initialize = createAction(INITIALIZE)<number[]>();
-export const leftarrowclick = createAction(LEFTARROWCLICK)();
-export const rightarrowclick = createAction(RIGHTARROWCLICK)();
-export const uparrowclick = createAction(UPARROWCLICK)();
-export const downarrowclick = createAction(DOWNARROWCLICK)();
+export const updateboxstate = createAction(UPDATEBOXSTATE)<number[][]>();
+export const createnewbox = createAction(CREATENEWBOX)<number[]>();
 
 const actions = {
   initialize,
-  leftarrowclick,
-  rightarrowclick,
-  uparrowclick,
-  downarrowclick,
+  updateboxstate,
+  createnewbox,
 };
 type BoxAction = ActionType<typeof actions>;
 
@@ -49,30 +42,19 @@ const box = createReducer<BoxState, BoxAction>(initialState, {
       });
     }),
   }),
-  [LEFTARROWCLICK]: (state) => ({
-    boxstate: getNextBoxState(1, state.boxstate).map((innerArray) => {
+  [UPDATEBOXSTATE]: (state, { payload: nextBoxState }) => ({
+    boxstate: nextBoxState.map((innerArray) => {
       return innerArray.map((number) => {
         return number;
       });
     }),
   }),
-  [RIGHTARROWCLICK]: (state) => ({
-    boxstate: getNextBoxState(2, state.boxstate).map((innerArray) => {
-      return innerArray.map((number) => {
-        return number;
-      });
-    }),
-  }),
-  [UPARROWCLICK]: (state) => ({
-    boxstate: getNextBoxState(3, state.boxstate).map((innerArray) => {
-      return innerArray.map((number) => {
-        return number;
-      });
-    }),
-  }),
-  [DOWNARROWCLICK]: (state) => ({
-    boxstate: getNextBoxState(4, state.boxstate).map((innerArray) => {
-      return innerArray.map((number) => {
+  [CREATENEWBOX]: (state, { payload: point }) => ({
+    boxstate: state.boxstate.map((innerArray, i) => {
+      return innerArray.map((number, j) => {
+        if (i === point[0] && j === point[1]) {
+          return point[2];
+        }
         return number;
       });
     }),

@@ -7,7 +7,7 @@ function getRandomPoint(boxState: number[][]) {
       break;
     }
   }
-  point[2] = Math.floor(Math.random() * 2) === 0 ? 2 : 4;
+  point[2] = Math.floor(Math.random() * 4) === 0 ? 4 : 2;
   return point;
 }
 
