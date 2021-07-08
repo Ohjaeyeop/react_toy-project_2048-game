@@ -7,6 +7,8 @@ import useArrowClick from "../hooks/useArrowClick";
 import useBox from "../hooks/useBox";
 import getNextBoxState from "../lib/getNextBoxState";
 import getRandomPoint from "../lib/getRandomPoint";
+import checkMovePossible from "../lib/checkMovePossible";
+import checkGameOver from "../lib/checkGameOver";
 
 const MainTemplateBlock = styled.div`
   width: 512px;
@@ -49,77 +51,61 @@ function MainTemplate() {
   const [point, setPoint] = useState<number[]>(getRandomPoints());
   const boxes = useBox();
 
+  // 상태 초기화
   const onClick = () => {
     setPoint(getRandomPoints());
     initiallize(point);
   };
 
+  // 박스 이동
+  const moveBox = useCallback(
+    (direction: number) => {
+      let checkCreateNewBox = false;
+      const p = new Promise((resolve, reject) => {
+        let timerId = setInterval(() => {
+          const movePossible = checkMovePossible(direction, boxes); // 이동 가능한지 체크
+          if (!movePossible) {
+            resolve(checkCreateNewBox);
+            setTimeout(() => clearInterval(timerId));
+          }
+          const nextBoxState = getNextBoxState(direction, boxes); // 이동한 후의 상태 가져오기
+          checkCreateNewBox = true;
+          onUpdateBoxState(nextBoxState);
+        }, 50);
+      });
+      p.then((checkCreateNewBox) => {
+        if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
+      });
+    },
+    [boxes, onCreateNewBox, onUpdateBoxState]
+  );
+
+  // 방향키 눌렀을 때
   const handleKeyDown = useCallback(
     (event: any): void => {
-      let checkCreateNewBox = false;
       if (event.key === "ArrowLeft") {
-        const p = new Promise((resolve, reject) => {
-          let timerId = setInterval(() => {
-            const { checkMovePossible, boxState } = getNextBoxState(1, boxes);
-            if (!checkMovePossible) {
-              resolve(checkCreateNewBox);
-              setTimeout(() => clearInterval(timerId));
-            }
-            checkCreateNewBox = true;
-            onUpdateBoxState(boxState);
-          }, 50);
-        });
-        p.then((checkCreateNewBox) => {
-          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
-        });
+        moveBox(1);
+        if (checkGameOver(boxes)) {
+          console.log("Game Over!!!");
+        }
       } else if (event.key === "ArrowRight") {
-        const p = new Promise((resolve, reject) => {
-          let timerId = setInterval(() => {
-            const { checkMovePossible, boxState } = getNextBoxState(2, boxes);
-            if (!checkMovePossible) {
-              resolve(checkCreateNewBox);
-              setTimeout(() => clearInterval(timerId));
-            }
-            checkCreateNewBox = true;
-            onUpdateBoxState(boxState);
-          }, 50);
-        });
-        p.then((checkCreateNewBox) => {
-          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
-        });
+        moveBox(2);
+        if (checkGameOver(boxes)) {
+          console.log("Game Over!!!");
+        }
       } else if (event.key === "ArrowUp") {
-        const p = new Promise((resolve, reject) => {
-          let timerId = setInterval(() => {
-            const { checkMovePossible, boxState } = getNextBoxState(3, boxes);
-            if (!checkMovePossible) {
-              resolve(checkCreateNewBox);
-              setTimeout(() => clearInterval(timerId));
-            }
-            checkCreateNewBox = true;
-            onUpdateBoxState(boxState);
-          }, 50);
-        });
-        p.then((checkCreateNewBox) => {
-          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
-        });
+        moveBox(3);
+        if (checkGameOver(boxes)) {
+          console.log("Game Over!!!");
+        }
       } else if (event.key === "ArrowDown") {
-        const p = new Promise((resolve, reject) => {
-          let timerId = setInterval(() => {
-            const { checkMovePossible, boxState } = getNextBoxState(4, boxes);
-            if (!checkMovePossible) {
-              resolve(checkCreateNewBox);
-              setTimeout(() => clearInterval(timerId));
-            }
-            checkCreateNewBox = true;
-            onUpdateBoxState(boxState);
-          }, 50);
-        });
-        p.then((checkCreateNewBox) => {
-          if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
-        });
+        moveBox(4);
+        if (checkGameOver(boxes)) {
+          console.log("Game Over!!!");
+        }
       }
     },
-    [boxes, onUpdateBoxState, onCreateNewBox]
+    [boxes, moveBox]
   );
 
   useEffect(() => {
