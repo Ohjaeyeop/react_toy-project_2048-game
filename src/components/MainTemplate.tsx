@@ -50,11 +50,13 @@ function MainTemplate() {
   const initiallize = useInitialize();
   const [point, setPoint] = useState<number[]>(getRandomPoints());
   const boxes = useBox();
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   // 상태 초기화
   const onClick = () => {
     setPoint(getRandomPoints());
     initiallize(point);
+    setIsGameOver(false);
   };
 
   // 박스 이동
@@ -83,29 +85,31 @@ function MainTemplate() {
   // 방향키 눌렀을 때
   const handleKeyDown = useCallback(
     (event: any): void => {
-      if (event.key === "ArrowLeft") {
-        moveBox(1);
-        if (checkGameOver(boxes)) {
-          console.log("Game Over!!!");
-        }
-      } else if (event.key === "ArrowRight") {
-        moveBox(2);
-        if (checkGameOver(boxes)) {
-          console.log("Game Over!!!");
-        }
-      } else if (event.key === "ArrowUp") {
-        moveBox(3);
-        if (checkGameOver(boxes)) {
-          console.log("Game Over!!!");
-        }
-      } else if (event.key === "ArrowDown") {
-        moveBox(4);
-        if (checkGameOver(boxes)) {
-          console.log("Game Over!!!");
+      if (!isGameOver) {
+        if (event.key === "ArrowLeft") {
+          moveBox(1);
+          if (checkGameOver(boxes)) {
+            setIsGameOver(true);
+          }
+        } else if (event.key === "ArrowRight") {
+          moveBox(2);
+          if (checkGameOver(boxes)) {
+            setIsGameOver(true);
+          }
+        } else if (event.key === "ArrowUp") {
+          moveBox(3);
+          if (checkGameOver(boxes)) {
+            setIsGameOver(true);
+          }
+        } else if (event.key === "ArrowDown") {
+          moveBox(4);
+          if (checkGameOver(boxes)) {
+            setIsGameOver(true);
+          }
         }
       }
     },
-    [boxes, moveBox]
+    [isGameOver, boxes, moveBox]
   );
 
   useEffect(() => {
@@ -123,7 +127,7 @@ function MainTemplate() {
           <button onClick={onClick}>New Game</button>
         </ButtonWrapper>
       </HeaderWrapper>
-      <MainBoard boxes={boxes} />
+      <MainBoard boxes={boxes} isGameOver={isGameOver} />
     </MainTemplateBlock>
   );
 }

@@ -1,12 +1,17 @@
 import React from "react";
 import styled from "styled-components";
 import palette from "../styles/palette";
+import GameOverModal from "./GameOverModal";
 
 const MainBoardBlock = styled.div`
   margin-top: 3rem;
   background-color: #bbac9f;
-  height: 512px;
   border-radius: 10px;
+  position: relative;
+`;
+
+const GridContainer = styled.div`
+  height: 512px;
   padding: 0.9rem;
   display: grid;
   grid-template-rows: repeat(4, 1fr);
@@ -42,15 +47,19 @@ const Box = styled.div<BoxProps>`
 
 function MainBoard(props: any) {
   const boxes: number[][] = props.boxes;
+  const isGameOver: boolean = props.isGameOver;
   return (
     <MainBoardBlock>
-      {boxes.map((boxline) =>
-        boxline.map((box) => (
-          <Box background={palette[box.toString()]} color={box.toString()}>
-            {box === 1 ? "" : box}
-          </Box>
-        ))
-      )}
+      <GameOverModal modal={isGameOver} />
+      <GridContainer>
+        {boxes.map((boxline) =>
+          boxline.map((box) => (
+            <Box background={palette[box.toString()]} color={box.toString()}>
+              {box === 1 ? "" : box}
+            </Box>
+          ))
+        )}
+      </GridContainer>
     </MainBoardBlock>
   );
 }
