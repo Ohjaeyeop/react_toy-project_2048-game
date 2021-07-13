@@ -9,6 +9,8 @@ import getNextBoxState from "../lib/getNextBoxState";
 import getRandomPoint from "../lib/getRandomPoint";
 import checkMovePossible from "../lib/checkMovePossible";
 import checkGameOver from "../lib/checkGameOver";
+import useIsMovable from "../hooks/useIsMovable";
+import useUpdateIsMovable from "../hooks/useUpdateIsMovable";
 
 const MainTemplateBlock = styled.div`
   width: 512px;
@@ -47,9 +49,11 @@ const ButtonWrapper = styled.div`
 
 function MainTemplate() {
   const { onUpdateBoxState, onCreateNewBox } = useArrowClick();
+  const updateIsMovable = useUpdateIsMovable();
   const initiallize = useInitialize();
   const [point, setPoint] = useState<number[]>(getRandomPoints());
   const boxes = useBox();
+  const isMovable = useIsMovable();
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   // 상태 초기화
@@ -63,23 +67,29 @@ function MainTemplate() {
   const moveBox = useCallback(
     (direction: number) => {
       let checkCreateNewBox = false;
+
       const p = new Promise((resolve, reject) => {
         let timerId = setInterval(() => {
-          const movePossible = checkMovePossible(direction, boxes); // 이동 가능한지 체크
+          const movePossible = checkMovePossible(direction, boxes, isMovable); // 이동 가능한지 체크
           if (!movePossible) {
             resolve(checkCreateNewBox);
             setTimeout(() => clearInterval(timerId));
           }
-          const nextBoxState = getNextBoxState(direction, boxes); // 이동한 후의 상태 가져오기
+          const [nextBoxState, nextIsMovable] = getNextBoxState(
+            direction,
+            boxes,
+            isMovable
+          ); // 이동한 후의 상태 가져오기
           checkCreateNewBox = true;
           onUpdateBoxState(nextBoxState);
+          updateIsMovable(nextIsMovable);
         }, 50);
       });
       p.then((checkCreateNewBox) => {
         if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
       });
     },
-    [boxes, onCreateNewBox, onUpdateBoxState]
+    [boxes, isMovable, onCreateNewBox, onUpdateBoxState, updateIsMovable]
   );
 
   // 방향키 눌렀을 때

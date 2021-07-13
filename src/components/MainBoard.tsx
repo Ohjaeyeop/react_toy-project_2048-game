@@ -36,8 +36,8 @@ const Box = styled.div<BoxProps>`
     props.color.length >= 5
       ? "1.5rem"
       : props.color.length >= 3
-      ? "2rem"
-      : "3rem"};
+      ? "2.5rem"
+      : "3.5rem"};
   border-radius: 4px;
   display: flex;
   justify-content: center;
@@ -52,9 +52,13 @@ function MainBoard(props: any) {
     <MainBoardBlock>
       <GameOverModal modal={isGameOver} />
       <GridContainer>
-        {boxes.map((boxline) =>
-          boxline.map((box) => (
-            <Box background={palette[box.toString()]} color={box.toString()}>
+        {boxes.map((boxline, i) =>
+          boxline.map((box, j) => (
+            <Box
+              background={palette[box.toString()]}
+              color={box.toString()}
+              key={`${i},${j}`}
+            >
               {box === 1 ? "" : box}
             </Box>
           ))
