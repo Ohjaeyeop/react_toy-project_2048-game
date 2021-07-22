@@ -10,7 +10,10 @@ function checkMovePossible(
           if (j - 1 >= 0) {
             if (boxState[i][j - 1] === 1) {
               return true;
-            } else if (boxState[i][j - 1] === boxState[i][j]) {
+            } else if (
+              boxState[i][j - 1] === boxState[i][j] &&
+              isMovable[i][j - 1]
+            ) {
               return true;
             }
           }
@@ -25,7 +28,10 @@ function checkMovePossible(
           if (j + 1 < 4) {
             if (boxState[i][j + 1] === 1) {
               return true;
-            } else if (boxState[i][j + 1] === boxState[i][j]) {
+            } else if (
+              boxState[i][j + 1] === boxState[i][j] &&
+              isMovable[i][j + 1]
+            ) {
               return true;
             }
           }
@@ -40,7 +46,10 @@ function checkMovePossible(
           if (i - 1 >= 0) {
             if (boxState[i - 1][j] === 1) {
               return true;
-            } else if (boxState[i - 1][j] === boxState[i][j]) {
+            } else if (
+              boxState[i - 1][j] === boxState[i][j] &&
+              isMovable[i - 1][j]
+            ) {
               return true;
             }
           }
@@ -55,7 +64,10 @@ function checkMovePossible(
           if (i + 1 < 4) {
             if (boxState[i + 1][j] === 1) {
               return true;
-            } else if (boxState[i + 1][j] === boxState[i][j]) {
+            } else if (
+              boxState[i + 1][j] === boxState[i][j] &&
+              isMovable[i + 1][j]
+            ) {
               return true;
             }
           }

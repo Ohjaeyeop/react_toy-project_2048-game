@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import palette from "../styles/palette";
 import GameOverModal from "./GameOverModal";
 
@@ -22,10 +22,20 @@ const GridContainer = styled.div`
 type BoxProps = {
   background: string;
   color: string;
+  event: number;
 };
 
+const boxAdd = keyframes`
+  0% {
+    opacity: 0%;
+  }
+  100% {
+    opacity: 100%;
+  }
+`;
+
 const Box = styled.div<BoxProps>`
-  background: ${(props) => props.background};
+  background-color: ${(props) => props.background};
   color: ${(props) =>
     props.color !== undefined &&
     props.color !== null &&
@@ -43,11 +53,21 @@ const Box = styled.div<BoxProps>`
   justify-content: center;
   align-items: center;
   font-weight: bold;
+  ${(props) => props.event === 1 && css`transition all 0.3s ease-in`};
+  ${(props) =>
+    props.event === 2 &&
+    css`
+      animation: ${boxAdd} 0.5s ease-in;
+    `};
 `;
 
 function MainBoard(props: any) {
   const boxes: number[][] = props.boxes;
   const isGameOver: boolean = props.isGameOver;
+  const boxEvent: number[][] = props.boxEvent;
+  console.log(boxes);
+  console.log(boxEvent);
+  console.log("-------------------");
   return (
     <MainBoardBlock>
       <GameOverModal modal={isGameOver} />
@@ -57,6 +77,7 @@ function MainBoard(props: any) {
             <Box
               background={palette[box.toString()]}
               color={box.toString()}
+              event={boxEvent[i][j]}
               key={`${i},${j}`}
             >
               {box === 1 ? "" : box}
@@ -68,4 +89,4 @@ function MainBoard(props: any) {
   );
 }
 
-export default MainBoard;
+export default React.memo(MainBoard);

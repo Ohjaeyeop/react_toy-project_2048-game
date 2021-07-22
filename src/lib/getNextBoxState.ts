@@ -1,8 +1,11 @@
+type getNextBoxStateType = [number[][], number[][], boolean[][]];
+
 function getNextBoxState(
   direction: number,
   boxState: number[][],
+  nextBoxEvent: number[][],
   isMovable: boolean[][]
-) {
+): getNextBoxStateType {
   if (direction === 1) {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
@@ -11,7 +14,11 @@ function getNextBoxState(
             if (boxState[i][j - 1] === 1) {
               boxState[i][j - 1] = boxState[i][j];
               boxState[i][j] = 1;
-            } else if (boxState[i][j - 1] === boxState[i][j]) {
+            } else if (
+              boxState[i][j - 1] === boxState[i][j] &&
+              isMovable[i][j - 1]
+            ) {
+              nextBoxEvent[i][j - 1] = 2;
               isMovable[i][j - 1] = false;
               boxState[i][j - 1] += boxState[i][j];
               boxState[i][j] = 1;
@@ -29,7 +36,11 @@ function getNextBoxState(
             if (boxState[i][j + 1] === 1) {
               boxState[i][j + 1] = boxState[i][j];
               boxState[i][j] = 1;
-            } else if (boxState[i][j + 1] === boxState[i][j]) {
+            } else if (
+              boxState[i][j + 1] === boxState[i][j] &&
+              isMovable[i][j + 1]
+            ) {
+              nextBoxEvent[i][j + 1] = 2;
               isMovable[i][j + 1] = false;
               boxState[i][j + 1] += boxState[i][j];
               boxState[i][j] = 1;
@@ -47,7 +58,11 @@ function getNextBoxState(
             if (boxState[i - 1][j] === 1) {
               boxState[i - 1][j] = boxState[i][j];
               boxState[i][j] = 1;
-            } else if (boxState[i - 1][j] === boxState[i][j]) {
+            } else if (
+              boxState[i - 1][j] === boxState[i][j] &&
+              isMovable[i - 1][j]
+            ) {
+              nextBoxEvent[i - 1][j] = 2;
               isMovable[i - 1][j] = false;
               boxState[i - 1][j] += boxState[i][j];
               boxState[i][j] = 1;
@@ -65,7 +80,11 @@ function getNextBoxState(
             if (boxState[i + 1][j] === 1) {
               boxState[i + 1][j] = boxState[i][j];
               boxState[i][j] = 1;
-            } else if (boxState[i + 1][j] === boxState[i][j]) {
+            } else if (
+              boxState[i + 1][j] === boxState[i][j] &&
+              isMovable[i + 1][j]
+            ) {
+              nextBoxEvent[i + 1][j] = 2;
               isMovable[i + 1][j] = false;
               boxState[i + 1][j] += boxState[i][j];
               boxState[i][j] = 1;
@@ -75,7 +94,7 @@ function getNextBoxState(
       }
     }
   }
-  return [boxState, isMovable];
+  return [boxState, nextBoxEvent, isMovable];
 }
 
 export default getNextBoxState;

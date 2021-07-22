@@ -4,13 +4,15 @@ import useInitialize from "../hooks/useInitialize";
 import MainBoard from "./MainBoard";
 import getRandomPoints from "../lib/getRandomPoints";
 import useArrowClick from "../hooks/useArrowClick";
-import useBox from "../hooks/useBox";
 import getNextBoxState from "../lib/getNextBoxState";
 import getRandomPoint from "../lib/getRandomPoint";
 import checkMovePossible from "../lib/checkMovePossible";
 import checkGameOver from "../lib/checkGameOver";
 import useIsMovable from "../hooks/useIsMovable";
 import useUpdateIsMovable from "../hooks/useUpdateIsMovable";
+import useReduxState from "../hooks/useReduxState";
+import useUpdateEvent from "../hooks/useUpdateEvent";
+import useInitialzeEvent from "../hooks/useInitializeEvent";
 
 const MainTemplateBlock = styled.div`
   width: 512px;
@@ -50,46 +52,64 @@ const ButtonWrapper = styled.div`
 function MainTemplate() {
   const { onUpdateBoxState, onCreateNewBox } = useArrowClick();
   const updateIsMovable = useUpdateIsMovable();
-  const initiallize = useInitialize();
-  const [point, setPoint] = useState<number[]>(getRandomPoints());
-  const boxes = useBox();
+  const initialize = useInitialize();
+  const updateEvent = useUpdateEvent();
+  const { box, event } = useReduxState();
   const isMovable = useIsMovable();
+  const initializeEvent = useInitialzeEvent();
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   // 상태 초기화
   const onClick = () => {
-    setPoint(getRandomPoints());
-    initiallize(point);
+    initialize(getRandomPoints());
     setIsGameOver(false);
   };
 
   // 박스 이동
   const moveBox = useCallback(
     (direction: number) => {
-      let checkCreateNewBox = false;
-
-      const p = new Promise((resolve, reject) => {
+      if (checkGameOver(box)) {
+        setIsGameOver(true);
+      } else {
+        let checkCreateNewBox = false;
+        let eventState: number[][] = Array.from(Array(4), () =>
+          Array(4).fill(0)
+        );
+        initializeEvent();
         let timerId = setInterval(() => {
-          const movePossible = checkMovePossible(direction, boxes, isMovable); // 이동 가능한지 체크
+          const movePossible = checkMovePossible(direction, box, isMovable); // 이동 가능한지 체크
           if (!movePossible) {
-            resolve(checkCreateNewBox);
+            if (checkCreateNewBox) {
+              const randomPoint = getRandomPoint(box);
+              onCreateNewBox(randomPoint);
+              eventState[randomPoint[0]][randomPoint[1]] = 1;
+              updateEvent(eventState);
+            }
             setTimeout(() => clearInterval(timerId));
+          } else {
+            const [nextBoxState, nextBoxEvent, nextIsMovable] = getNextBoxState(
+              direction,
+              box,
+              eventState,
+              isMovable
+            ); // 이동한 후의 상태 가져오기
+            checkCreateNewBox = true;
+            eventState = nextBoxEvent;
+            onUpdateBoxState(nextBoxState);
+            updateIsMovable(nextIsMovable);
           }
-          const [nextBoxState, nextIsMovable] = getNextBoxState(
-            direction,
-            boxes,
-            isMovable
-          ); // 이동한 후의 상태 가져오기
-          checkCreateNewBox = true;
-          onUpdateBoxState(nextBoxState);
-          updateIsMovable(nextIsMovable);
-        }, 50);
-      });
-      p.then((checkCreateNewBox) => {
-        if (checkCreateNewBox) onCreateNewBox(getRandomPoint(boxes));
-      });
+        }, 60);
+      }
     },
-    [boxes, isMovable, onCreateNewBox, onUpdateBoxState, updateIsMovable]
+    [
+      box,
+      initializeEvent,
+      isMovable,
+      onCreateNewBox,
+      onUpdateBoxState,
+      updateEvent,
+      updateIsMovable,
+    ]
   );
 
   // 방향키 눌렀을 때
@@ -98,28 +118,16 @@ function MainTemplate() {
       if (!isGameOver) {
         if (event.key === "ArrowLeft") {
           moveBox(1);
-          if (checkGameOver(boxes)) {
-            setIsGameOver(true);
-          }
         } else if (event.key === "ArrowRight") {
           moveBox(2);
-          if (checkGameOver(boxes)) {
-            setIsGameOver(true);
-          }
         } else if (event.key === "ArrowUp") {
           moveBox(3);
-          if (checkGameOver(boxes)) {
-            setIsGameOver(true);
-          }
         } else if (event.key === "ArrowDown") {
           moveBox(4);
-          if (checkGameOver(boxes)) {
-            setIsGameOver(true);
-          }
         }
       }
     },
-    [isGameOver, boxes, moveBox]
+    [isGameOver, moveBox]
   );
 
   useEffect(() => {
@@ -137,7 +145,7 @@ function MainTemplate() {
           <button onClick={onClick}>New Game</button>
         </ButtonWrapper>
       </HeaderWrapper>
-      <MainBoard boxes={boxes} isGameOver={isGameOver} />
+      <MainBoard boxes={box} boxEvent={event} isGameOver={isGameOver} />
     </MainTemplateBlock>
   );
 }
