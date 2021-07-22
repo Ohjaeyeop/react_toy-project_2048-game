@@ -65,9 +65,6 @@ function MainBoard(props: any) {
   const boxes: number[][] = props.boxes;
   const isGameOver: boolean = props.isGameOver;
   const boxEvent: number[][] = props.boxEvent;
-  console.log(boxes);
-  console.log(boxEvent);
-  console.log("-------------------");
   return (
     <MainBoardBlock>
       <GameOverModal modal={isGameOver} />
